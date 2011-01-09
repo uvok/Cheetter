@@ -2,15 +2,21 @@ import sqlite3 as sq
 
 class liteDB( object ):
     def __init__(self):
+        """ Opens table and calls _check_table  """
+        
         self.connection=sq.connect("cheetter.sql")
         self.cursor=self.connection.cursor()
         self._check_table()
 
     def __del__(self):
+        """ Closes connection - may fail if table is in uncommited state """
+        
         self.cursor.close()
         self.connection.close()
 
     def _check_table(self):
+        """ Checks if table accounts is in database """
+        
         self.cursor.execute("""SELECT * FROM sqlite_master WHERE name='accounts'""")
         result=self.cursor.fetchall()
 
@@ -19,10 +25,16 @@ class liteDB( object ):
             self._create_table()
 
     def _create_table(self):
+        """ Creates table accounts - don't call yourself """
+        
         self.cursor.execute("""CREATE TABLE accounts(name TEXT, oauth TEXT, oauth_secret TEXT)""")
         self.connection.commit()
 
     def add_entry(self, name, oauth, oauth_secret):
+        """ Add an account to table accounts
+
+        Includes check if account with specified name already exists """
+        
         ret=self._chk_alr_exist(name)
         if ret==-1:
             print "Adding Account unsuccessful!"
@@ -33,6 +45,8 @@ class liteDB( object ):
         self.connection.commit()
 
     def _chk_alr_exist(self, name):
+        """ Checks if account w/ name already exists - called by add_entry """
+        
         self.cursor.execute("SELECT * FROM accounts WHERE name=?", (name, ))
         res=self.cursor.fetchall()
         if len(res)>=1:
@@ -48,6 +62,8 @@ class liteDB( object ):
                 return -1
 
     def delete_entry(self, name):
+        """ Delete account(s) from table - No asking, so be careful """
+        
         query="DELETE FROM accounts WHERE name=?"
         self.cursor.execute(query, (name, ))
         self.connection.commit()
