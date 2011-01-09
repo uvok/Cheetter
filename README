@@ -1,0 +1,8 @@
+This is an twitter-client in development.
+It's still in progress.
+
+Notice that consumer and consumer-keys aren't added here, as I don't think it's a good idea to make them public,
+on the other hand I have no idea how to store them "secretly", so nobody can see them (don't think that's possible,
+though).
+
+For console. Written using python-twitter library
