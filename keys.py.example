@@ -1,0 +1,8 @@
+## uvok
+access_token_example = {'consumer_key': '',
+                     'consumer_secret': '',
+                     'oauth_token': '', 
+                     'oauth_token_secret': '',
+                     'name': ''}
+
+access_token_list=[access_token_example]
