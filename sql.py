@@ -75,3 +75,4 @@ class liteDB( object ):
         self.cursor.execute("SELECT * FROM accounts")
         len=(self.cursor.fetchall())
         return 0
+
