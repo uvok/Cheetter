@@ -20,7 +20,7 @@ class liteDB( object ):
         self.cursor.execute("""SELECT * FROM sqlite_master WHERE name='accounts'""")
         result=self.cursor.fetchall()
 
-        if len(result)==0: # create table
+        if len(result)==0:
             print "Account table doesn't exist yet, creating..."
             self._create_table()
 
@@ -44,26 +44,34 @@ class liteDB( object ):
         self.cursor.execute(query, tup)
         self.connection.commit()
 
-    def _chk_alr_exist(self, name):
-        """ Checks if account w/ name already exists - called by add_entry """
-        
-        self.cursor.execute("SELECT * FROM accounts WHERE name=?", (name, ))
-        res=self.cursor.fetchall()
-        if len(res)>=1:
-            answ=raw_input("Account already exists! [D]elete already existing or [C]ancel?")
-            answ=answ.lower()
-            if answ=='d':
-                self.delete_entry(name)
-                return 0
-            elif answ=='c':
-                return -1
-            else:
-                print "None allowed Input >:( Cancelling"
-                return -1
-
     def delete_entry(self, name):
         """ Delete account(s) from table - No asking, so be careful """
         
         query="DELETE FROM accounts WHERE name=?"
         self.cursor.execute(query, (name, ))
         self.connection.commit()
+
+    def _chk_alr_exist(self, name):
+        """ Checks if account w/ name already exists - called by add_entry """
+        
+        self.cursor.execute("SELECT * FROM accounts WHERE name=?", (name, ))
+        res=self.cursor.fetchall()
+        if len(res)>=1:
+            while True:
+                answ=raw_input("Account already exists! [D]elete already existing or [C]ancel? ")
+                answ=answ.lower()
+                if answ=='d':
+                    self.delete_entry(name)
+                    state=0
+                    break
+                elif answ=='c':
+                    state=-1
+                    break
+                else:
+                    print "No allowed Input >:( "
+        return state
+
+    def howmany(self):
+        self.cursor.execute("SELECT * FROM accounts")
+        len=(self.cursor.fetchall())
+        return 0
