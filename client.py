@@ -3,6 +3,7 @@ import pprint
 import os
 import sys
 import textwrap
+import colorprint as cp
 
 splitlenght=80
 headerwidth=splitlenght+20
@@ -148,7 +149,7 @@ def printLine(name, text, continued=False):
     text (string) - text of status message
     continued (bool) - Is output continued from a previous line?"""
     if continued==False:
-        print "[%s] %s" % (name.center(20), text)
+        print "[%s] %s" % (cp.nickname(name.center(20)), text)
     else:
         print " ".ljust(22), text
 
@@ -159,10 +160,10 @@ def printMessageObject(msgs):
     
     i=0
     for msg in msgs:
-        prefix=" ("+str(i).center(2)+") "
+#        prefix=" ("+str(i).center(2)+") "
         if isinstance(msg, twt.Status):
             sender=msg.user.screen_name
-            content=prefix+msg.text
+            content=msg.text
         elif isinstance(msg, twt.DirectMessage):
             sender=msg.sender_screen_name
             content=msg.text
