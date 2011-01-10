@@ -5,6 +5,7 @@ class liteDB( object ):
         """ Opens table and calls _check_table  """
         
         self.connection=sq.connect("cheetter.sql")
+        self.connection.row_factory = sq.Row
         self.cursor=self.connection.cursor()
         self._check_table()
 
@@ -27,7 +28,7 @@ class liteDB( object ):
     def _create_table(self):
         """ Creates table accounts - don't call yourself """
         
-        self.cursor.execute("""CREATE TABLE accounts(name TEXT, oauth TEXT, oauth_secret TEXT)""")
+        self.cursor.execute("""CREATE TABLE accounts(name TEXT PRIMARY KEY, oauth TEXT, oauth_secret TEXT)""")
         self.connection.commit()
 
     def add_entry(self, name, oauth, oauth_secret):
@@ -43,6 +44,7 @@ class liteDB( object ):
         query="""INSERT INTO accounts VALUES(?, ?, ?)"""
         self.cursor.execute(query, tup)
         self.connection.commit()
+        return 0
 
     def delete_entry(self, name):
         """ Delete account(s) from table - No asking, so be careful """
@@ -51,11 +53,18 @@ class liteDB( object ):
         self.cursor.execute(query, (name, ))
         self.connection.commit()
 
+    def modify_entry(self, name, oauth, oauth_secret):
+        """ Modifies account by deleting and readding it """
+        self.delete_entry(name)
+        ret=self.add_entry(name, oauth, oauth_secret)
+        return ret
+
     def _chk_alr_exist(self, name):
         """ Checks if account w/ name already exists - called by add_entry """
         
         self.cursor.execute("SELECT * FROM accounts WHERE name=?", (name, ))
         res=self.cursor.fetchall()
+        state=None
         if len(res)>=1:
             while True:
                 answ=raw_input("Account already exists! [D]elete already existing or [C]ancel? ")
@@ -72,7 +81,25 @@ class liteDB( object ):
         return state
 
     def howmany(self):
-        self.cursor.execute("SELECT * FROM accounts")
-        len=(self.cursor.fetchall())
-        return 0
+        """ Returns number of entries in the database """
 
+        res=self.dumpTable()
+        return len(res)
+
+    def dumpTable(self):
+        """ Returns all entries in databse """
+        
+        res=self.searchEntry("all")
+        return res
+        
+
+    def searchEntry(self, name):
+        """ Search account with specified name """
+        
+        if name is not "all":
+            self.cursor.execute("SELECT * FROM accounts WHERE name=?", (name, ))
+        else:
+            self.cursor.execute("SELECT * FROM accounts")
+        result=self.cursor.fetchall()
+        print "DEBUG: Fetched", len(result), "accounts"
+        return result
