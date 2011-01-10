@@ -26,3 +26,33 @@ class AccountManager( object ):
                     print "Invalid answer"
                     pass
             
+
+    def AddAccount(self):
+        # get this stupid token thingie
+        # Validate this thing
+        # Validate User - user object -> name for database
+        return
+
+    def DeleteAccount(self):
+        sel=self.SelectAccount()
+        self.db.delete_entry(self.result[sel]['name'])
+        return
+
+    def ListAccounts(self):
+        self.result=self.db.dumpTable()
+        for num, res in enumerate(self.result):
+            print "%i) %s" % (num, res['name'])
+        return
+
+    def SelectAccount(self):
+        selection=None
+        self.ListAccounts()
+        if len(self.result) != 0:
+            while True:
+                selection=int(raw_input("Which account? "))
+                if 0<=selection<len(self.result):
+                    break
+                else:
+                    pass
+
+        return selection    
