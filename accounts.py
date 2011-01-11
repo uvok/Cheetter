@@ -17,8 +17,11 @@ class AccountManager( object ):
                 answ=raw_input()
 
                 if answ.lower()=='y':
-                    self.AddAccount()
-                    break
+                    re=self.AddAccount()
+                    if re!=-1:
+                        pass
+                    else:
+                        break
                 elif answ.lower()=='n':
                     print "Using client not possible w/o account, quitting"
                     exit()
@@ -26,7 +29,6 @@ class AccountManager( object ):
                     print "Invalid answer"
                     pass
             
-
     def AddAccount(self):
         # get this stupid token thingie
         # Validate this thing
@@ -36,6 +38,13 @@ class AccountManager( object ):
     def DeleteAccount(self):
         sel=self.SelectAccount()
         self.db.delete_entry(self.result[sel]['name'])
+        self._NoAccounts()
+        return
+
+    def ReauthAccount(self):
+        # 2 possibilities:
+        # 1st: Deleting account and adding account
+        # 2nd: Somehow use sq.modify_entry
         return
 
     def ListAccounts(self):
@@ -56,3 +65,7 @@ class AccountManager( object ):
                     pass
 
         return selection    
+
+    def GetAccount(self):
+        sel=self.SelectAccount()
+        return self.result[sel]
