@@ -19,9 +19,9 @@ class AccountManager( object ):
                 if answ.lower()=='y':
                     re=self.AddAccount()
                     if re!=-1:
-                        pass
-                    else:
                         break
+                    else:
+                        pass
                 elif answ.lower()=='n':
                     print "Using client not possible w/o account, quitting"
                     exit()
