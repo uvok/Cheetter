@@ -1,3 +1,6 @@
 *~
 keys.py
 *.pyc
+fetch-follower-following-pics.py
+*.sql
+*.sqlite
