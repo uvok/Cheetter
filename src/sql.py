@@ -1,105 +1,81 @@
 import sqlite3 as sq
 
-class liteDB( object ):
+class liteDB(object):
+    """ Interface for sqlite3 database, used to handle accounts """
+    
     def __init__(self):
-        """ Opens table and calls _check_table  """
+        """ Opens table and calls _check_table  - autocommit mode """
         
-        self.connection=sq.connect("cheetter.sql")
+        # TODO: This file in ~/.cheetter 
+        self.connection = sq.connect("cheetter.sql", isolation_level=None)
         self.connection.row_factory = sq.Row
-        self.cursor=self.connection.cursor()
-        self._check_table()
+        self.cursor = self.connection.cursor()
+        self._create_table()
 
     def __del__(self):
-        """ Closes connection - may fail if table is in uncommited state """
+        """ Closes connection - may fail if table is in non-committed state? """
         
         self.cursor.close()
         self.connection.close()
 
-    def _check_table(self):
-        """ Checks if table accounts is in database """
-        
-        self.cursor.execute("""SELECT * FROM sqlite_master WHERE name='accounts'""")
-        result=self.cursor.fetchall()
-
-        if len(result)==0:
-            print "Account table doesn't exist yet, creating..."
-            self._create_table()
-
     def _create_table(self):
-        """ Creates table accounts - don't call yourself """
+        """ Creates table accounts if not exists """
         
-        self.cursor.execute("""CREATE TABLE accounts(name TEXT PRIMARY KEY, oauth TEXT, oauth_secret TEXT)""")
-        self.connection.commit()
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS accounts(name TEXT PRIMARY KEY, oauth TEXT, oauth_secret TEXT)""")
 
     def add_entry(self, name, oauth, oauth_secret):
         """ Add an account to table accounts
 
-        Includes check if account with specified name already exists """
+        returns 0 if  successful, -1 if error occurred """
         
-        ret=self._chk_alr_exist(name)
-        if ret==-1:
-            print "Adding Account unsuccessful!"
+        tup = (name, oauth, oauth_secret)
+        query = """INSERT INTO accounts VALUES(?, ?, ?)"""
+
+        try:
+            self.cursor.execute(query, tup)
+        except sq.IntegrityError, ex:
+            print "Entry already exists. Please delete old entry first"
+            print ex
             return -1
-        tup=(name, oauth, oauth_secret)
-        query="""INSERT INTO accounts VALUES(?, ?, ?)"""
-        self.cursor.execute(query, tup)
-        self.connection.commit()
         return 0
 
     def delete_entry(self, name):
-        """ Delete account(s) from table - No asking, so be careful """
+        """ Delete account(s) from table - No confirmation prompt, so be careful """
         
-        query="DELETE FROM accounts WHERE name=?"
-        self.cursor.execute(query, (name, ))
-        self.connection.commit()
+        query = "DELETE FROM accounts WHERE name=?"
+        self.cursor.execute(query, (name,))
 
     def modify_entry(self, name, oauth, oauth_secret):
-        """ Modifies account by deleting and readding it """
-        self.delete_entry(name)
-        ret=self.add_entry(name, oauth, oauth_secret)
-        return ret
+        """ Modifies account by deleting and reading it 
 
-    def _chk_alr_exist(self, name):
-        """ Checks if account w/ name already exists - called by add_entry """
-        
-        self.cursor.execute("SELECT * FROM accounts WHERE name=?", (name, ))
-        res=self.cursor.fetchall()
-        state=None
-        if len(res)>=1:
-            while True:
-                answ=raw_input("Account already exists! [D]elete already existing or [C]ancel? ")
-                answ=answ.lower()
-                if answ=='d':
-                    self.delete_entry(name)
-                    state=0
-                    break
-                elif answ=='c':
-                    state=-1
-                    break
-                else:
-                    print "No allowed Input >:( "
-        return state
+        May actually not be needed at all """
+
+        self.delete_entry(name)
+        ret = self.add_entry(name, oauth, oauth_secret)
+        return ret
 
     def howmany(self):
         """ Returns number of entries in the database """
 
-        res=self.dumpTable()
+        res = self.dumpTable()
         return len(res)
 
     def dumpTable(self):
-        """ Returns all entries in databse """
+        """ Returns all entries in database using searchEntry() """
         
-        res=self.searchEntry("all")
+        res = self.searchEntry("all")
         return res
         
 
     def searchEntry(self, name):
-        """ Search account with specified name """
-        
+        """ Search account with specified name 
+
+        returns list of results """
+
+        # There is no twitter account all, so this shouldn't be a problem
         if name is not "all":
-            self.cursor.execute("SELECT * FROM accounts WHERE name=?", (name, ))
+            self.cursor.execute("SELECT * FROM accounts WHERE name=?", (name,))
         else:
             self.cursor.execute("SELECT * FROM accounts")
-        result=self.cursor.fetchall()
-        print "DEBUG: Fetched", len(result), "accounts"
+        result = self.cursor.fetchall()
         return result
