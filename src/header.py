@@ -1,8 +1,8 @@
 import twitter as twt
-import pprint
 import time
-import sys
 from keys import *
+
+chirp=None
 
 def getRemaining():
     remain = chirp.GetRateLimitStatus()

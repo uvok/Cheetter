@@ -1,6 +1,5 @@
 from header import *
 import pprint
-import os
 import sys
 import textwrap
 import colorprint as cp
@@ -12,7 +11,6 @@ def Decision():
     """  Returns 1 for next, 2 for replay, 0 for main menu """
     print "[n]ext page, [r]eply to a tweet, [b]ack to main menu\n?> ",
     dec={"n":1, "r":2, "b":0}
-    a=""
     a=raw_input()
     try:
         return dec[a]
@@ -27,7 +25,6 @@ def postReply(msg):
     
     repl_id=msg.id
     repl_name=msg.user.screen_name
-    repl_text=msg.text
     print "reply to: [%s] %s" % (repl_name, msg.text)
     rt=raw_input(":> @{0} ".format(repl_name))
     extra_text="@"+repl_name+" "+u"\u2026"

@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import twitter as twt
-import pprint
 from header import *
 import os
 
