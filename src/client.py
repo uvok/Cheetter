@@ -1,4 +1,4 @@
-from header import *
+from auth import *
 import pprint
 import sys
 import textwrap
