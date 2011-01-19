@@ -6,7 +6,7 @@ import colorprint as cp
 import time
 
 splitlength=120
-headerwidth=splitlength+20
+headerwidth=splitlength
 
 def Decision():
     """  Returns 1 for next, 2 for replay, 0 for main menu """
