@@ -3,6 +3,7 @@ import pprint
 import sys
 import textwrap
 import colorprint as cp
+import time
 
 splitlength=120
 headerwidth=splitlength+20
@@ -140,46 +141,43 @@ def printDMs(pg=1, amnt=20):
         return
 
 def printTimeUser(screen_name, time):
+
     print u"[%s] %s" \
           % (cp.time(time), cp.nickname(screen_name))
 
-def printLine(name, text, continued=False):
+def printTextLine(text):
     """ Print a line w/ a status message
 
-    name (string) - screen name
-    text (string) - text of status message
-    continued (bool) - Is output continued from a previous line?"""
-    if continued==False:
-        print "[%s] %s" % (cp.nickname(name.center(20)), text)
-    else:
-        print " ".ljust(22), text
+    text (string) - text of status message"""
+
+    print " ".ljust(2), text.encode("utf-8")
 
 def printMessageObject(msgs):
     """ Prints status objects or DMs
 
     msgs (list) - list of message objects"""
     
-    i=0
     for msg in msgs:
-#        prefix=" ("+str(i).center(2)+") "
+        content=msg.text
+        sec=msg.GetCreatedAtInSeconds()
+        tim = time.strftime("%H:%M:%S", time.localtime(sec))
+
         if isinstance(msg, twt.Status):
             sender=msg.user.screen_name
-            content=msg.text
         elif isinstance(msg, twt.DirectMessage):
             sender=msg.sender_screen_name
-            content=msg.text
         else:
             print "error"
             exit()
-            
-        cont=False
-        spltxt=textwrap.wrap(content, splitlength) ## splrep ist der Text!!
-        for j in spltxt:
-            printLine(sender, j[0:splitlength], cont)
-            if len(j)>splitlength:
-                printLine(sender, j[splitlength:140], True)
-            cont=True
-        i+=1
+
+        spltxt=textwrap.wrap(content, splitlength)
+
+        printTimeUser(sender, tim)
+
+        for line in spltxt:
+            printTextLine(line[0:splitlength])
+            if len(line)>splitlength:
+                printTextLine(line[splitlength:140])
 
 def main():
     menu=( ("Quit", exit),
