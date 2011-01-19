@@ -139,6 +139,10 @@ def printDMs(pg=1, amnt=20):
     else:
         return
 
+def printTimeUser(screen_name, time):
+    print u"[%s] %s" \
+          % (cp.time(time), cp.nickname(screen_name))
+
 def printLine(name, text, continued=False):
     """ Print a line w/ a status message
 
