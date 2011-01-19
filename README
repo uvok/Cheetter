@@ -6,3 +6,9 @@ on the other hand I have no idea how to store them "secretly", so nobody can see
 though).
 
 For console. Written using python-twitter library
+
+-
+This client uses python-twitter momentarily, but will *very soon* start using my own clone of the library:
+http://code.google.com/r/uvokch337ah-python-twitter-lists
+
+This is because the python-twitter library doesn't support list statuses yet, but this ais a very important feature to me.
