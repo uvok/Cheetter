@@ -4,8 +4,8 @@ import sys
 import textwrap
 import colorprint as cp
 
-splitlenght=80
-headerwidth=splitlenght+20
+splitlength=120
+headerwidth=splitlength+20
 
 def Decision():
     """  Returns 1 for next, 2 for replay, 0 for main menu """
@@ -169,11 +169,11 @@ def printMessageObject(msgs):
             exit()
             
         cont=False
-        spltxt=textwrap.wrap(content, splitlenght) ## splrep ist der Text!!
+        spltxt=textwrap.wrap(content, splitlength) ## splrep ist der Text!!
         for j in spltxt:
-            printLine(sender, j[0:splitlenght], cont)
-            if len(j)>splitlenght:
-                printLine(sender, j[splitlenght:140], True)
+            printLine(sender, j[0:splitlength], cont)
+            if len(j)>splitlength:
+                printLine(sender, j[splitlength:140], True)
             cont=True
         i+=1
 
