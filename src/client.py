@@ -5,14 +5,14 @@ import textwrap
 import colorprint as cp
 import time
 
-splitlength=120
-headerwidth=splitlength
+splitlength = 120
+headerwidth = splitlength
 
 def Decision():
     """  Returns 1 for next, 2 for replay, 0 for main menu """
     print "[n]ext page, [r]eply to a tweet, [b]ack to main menu\n?> ",
-    dec={"n":1, "r":2, "b":0}
-    a=raw_input()
+    dec = {"n":1, "r":2, "b":0}
+    a = raw_input()
     try:
         return dec[a]
     except KeyError:
@@ -24,21 +24,21 @@ def postReply(msg):
 
     msg (message object to reply to) """
     
-    repl_id=msg.id
-    repl_name=msg.user.screen_name
+    repl_id = msg.id
+    repl_name = msg.user.screen_name
     print "reply to: [%s] %s" % (repl_name, msg.text)
-    rt=raw_input(":> @{0} ".format(repl_name))
-    extra_text="@"+repl_name+" "+u"\u2026"
-    split_length=135-len(extra_text.encode("utf-8"))
-    replist=textwrap.wrap(rt, split_length)
-    maxind=len(replist)-1
-    n=-1
+    rt = raw_input(":> @{0} ".format(repl_name))
+    extra_text = "@" + repl_name + " " + u"\u2026"
+    split_length = 135 - len(extra_text.encode("utf-8"))
+    replist = textwrap.wrap(rt, split_length)
+    maxind = len(replist) - 1
+    n = -1
     for i in replist:
-        n+=1
-        if maxind-n: ## continued mode
-            reply="@{0} {1}{2}".format(repl_name, i, u"\u2026".encode("utf-8"))
+        n += 1
+        if maxind - n: ## continued mode
+            reply = "@{0} {1}{2}".format(repl_name, i, u"\u2026".encode("utf-8"))
         else: ## non-continued mode
-            reply="@{0} {1}".format(repl_name, i)
+            reply = "@{0} {1}".format(repl_name, i)
         postUpdate(reply, repl_id)
 
 def postUpdate(txt=None, irt_id=None):
@@ -49,16 +49,16 @@ def postUpdate(txt=None, irt_id=None):
     
     #arg={"in_reply_to_status_id":irt_id}
     if txt:
-        msg=txt
+        msg = txt
         print "Sending message: \"%s\"" % (msg),
         if irt_id: print "(REPLY)",
 
         try:
-            a=raw_input("\nokay? ")
+            a = raw_input("\nokay? ")
         except KeyboardInterrupt:
             print "Abbruch"
             return
-        if a!="y":
+        if a != "y":
             return
     else:
         msg = raw_input("Status?: ")
@@ -76,18 +76,18 @@ def postUpdate(txt=None, irt_id=None):
 
 def printHome(pg=1, count=40):
     """ Prints home timeline) """
-    print headerwidth*'+'
+    print headerwidth * '+'
     print " Home Timeline ".center(headerwidth, '+')
-    print headerwidth*'+'
-    hom=chirp.GetFriendsTimeline(count=count, page=pg)
+    print headerwidth * '+'
+    hom = chirp.GetFriendsTimeline(count=count, page=pg)
     print len(hom)
     printMessageObject(hom)
 
-    ho=Decision()
-    if ho==1:
-        printHome(pg=pg+1)
-    elif ho==2:
-        nr=int(raw_input("Reply to status # "))
+    ho = Decision()
+    if ho == 1:
+        printHome(pg=pg + 1)
+    elif ho == 2:
+        nr = int(raw_input("Reply to status # "))
         try:
             postReply(hom[nr])
         except KeyError:
@@ -101,19 +101,19 @@ def printReplies(pg=1, amnt=20):
     pg (int) - page to fetch
     amnt (int) - amount of replies on page nr to fetch"""
     
-    print headerwidth*'#'
+    print headerwidth * '#'
     print " @replies ".center(headerwidth, '#')
-    print headerwidth*'#'
-    reps=chirp.GetReplies(page=pg)
+    print headerwidth * '#'
+    reps = chirp.GetReplies(page=pg)
 
     while True:
         printMessageObject(reps[0:amnt])
     
-        re=Decision()
-        if re==1:
-            printReplies(pg+1)
-        elif re==2:
-            nr=int(raw_input("Reply to status # "))
+        re = Decision()
+        if re == 1:
+            printReplies(pg + 1)
+        elif re == 2:
+            nr = int(raw_input("Reply to status # "))
             try:
                 postReply(reps[nr])
             except IndexError:
@@ -127,23 +127,26 @@ def printDMs(pg=1, amnt=20):
     pg (int) - page to fetch
     amnt (int) - amount of direct messages on page nr to fetch"""
 
-    print headerwidth*'*'
+    print headerwidth * '*'
     print " DMs ".center(headerwidth, '*')
-    print headerwidth*'*'
-    dms=chirp.GetDirectMessages(page=pg)
+    print headerwidth * '*'
+    dms = chirp.GetDirectMessages(page=pg)
     printMessageObject(dms[0:amnt])
-    re=Decision()
-    if re==1:
-        printDMs(pg+1)
-    elif re==2:
+    re = Decision()
+    if re == 1:
+        printDMs(pg + 1)
+    elif re == 2:
         postDM() ## TODO: PostDM
     else:
         return
 
 def printTimeUser(screen_name, time):
 
-    print u"[%s] %s" \
-          % (cp.time(time), cp.nickname(screen_name))
+    print u"[{0}] {1}".format(cp.nickname(screen_name).ljust(20 + len(cp.nickname(""))),
+                              cp.time(time).rjust(splitlength - 23 + len(cp.time(""))))
+    # colorprint makes the string longer, so ljust/rjust doesn't work correctly anymore...
+    # 33 - 20-character string (nick)
+    # +9 - date is 9 characters "longer" with colorprint
 
 def printTextLine(text):
     """ Print a line w/ a status message
@@ -158,44 +161,44 @@ def printMessageObject(msgs):
     msgs (list) - list of message objects"""
     
     for msg in msgs:
-        content=msg.text
-        sec=msg.GetCreatedAtInSeconds()
-        tim = time.strftime("%H:%M:%S", time.localtime(sec))
+        content = msg.text
+        sec = msg.GetCreatedAtInSeconds()
+        tim = time.strftime("%d. %b %Y, %X", time.localtime(sec))
 
         if isinstance(msg, twt.Status):
-            sender=msg.user.screen_name
+            sender = msg.user.screen_name
         elif isinstance(msg, twt.DirectMessage):
-            sender=msg.sender_screen_name
+            sender = msg.sender_screen_name
         else:
             print "error"
             exit()
 
-        spltxt=textwrap.wrap(content, splitlength)
+        spltxt = textwrap.wrap(content, splitlength)
 
         printTimeUser(sender, tim)
 
         for line in spltxt:
             printTextLine(line[0:splitlength])
-            if len(line)>splitlength:
+            if len(line) > splitlength:
                 printTextLine(line[splitlength:140])
 
 def main():
-    menu=( ("Quit", exit),
+    menu = (("Quit", exit),
            ("Print Home Timeline", printHome),
-           ("Post Update",postUpdate),
-           ("Print Replies",printReplies),
-           ("Print DMs",printDMs) )
+           ("Post Update", postUpdate),
+           ("Print Replies", printReplies),
+           ("Print DMs", printDMs))
 
     # Print Menu Selection
     for num, tup in enumerate(menu):
-        if num==0: continue
+        if num == 0: continue
         print num, "\b)", tup[0]
     print "\n0) Quit"
-    selec=raw_input(">>>")
+    selec = raw_input(">>>")
     
-    if selec.isdigit()==True:
-        selec=int(selec)
-        if selec>0 and selec<len(menu):
+    if selec.isdigit() == True:
+        selec = int(selec)
+        if selec > 0 and selec < len(menu):
             menu[selec][1]()
             main()
 #        elif selec==0:
@@ -204,8 +207,9 @@ def main():
             pass
 
 if __name__ == "__main__":
-    chirp=SelectAccount(True)
+    chirp = SelectAccount(True)
 
     if len(sys.argv) > 1:
         postUpdate(" ".join(sys.argv[1:]))
     else: main()
+
